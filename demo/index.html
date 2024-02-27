@@ -1,22 +1,70 @@
-<!-- Small manual front-end test to see it all works -->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Translate example</title>
-  </head>
-  <body>
-    <p class="greeting">Loading...</p>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translation API Test</title>
+</head>
+<body>
+    <h1>Translation API Test</h1>
 
-    <script src="/translate.min.js"></script>
+    <div>
+        <label for="text">Text:</label>
+        <input type="text" id="text" value="Hello world">
+    </div>
+
+    <div>
+        <label for="targetLanguage">Target Language:</label>
+        <select id="targetLanguage">
+            <option value="da">🇩🇰 Danish (Dansk)</option>
+            <option value="es">🇪🇸 Spanish (Español)</option>
+            <option value="fr">🇫🇷 French (Français)</option>
+            <option value="uk">🇺🇦 Ukrainian (Українська)</option>
+            <option value="pl">🇵🇱 Polish (Polski)</option>
+            <option value="ru">🇷🇺 Russian (Русский)</option>
+            <option value="de">🇩🇪 German (Deutsch)</option>
+            <!-- Add more options as needed -->
+        </select>
+    </div>
+
+    <button onclick="performTranslation()">Translate</button>
+
+    <div id="result"></div>
+
     <script>
-      (async () => {
-        const text = await translate("Hello world", "es");
-        const el = document.querySelector(".greeting");
-        el.innerText = `Hello world => ${text}`;
-      })();
+        async function performTranslation() {
+            const text = document.getElementById('text').value;
+            const targetLanguage = document.getElementById('targetLanguage').value;
+            const url = 'http://localhost:3000/translate';
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text, targetLanguage })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to translate');
+                }
+
+                const data = await response.json();
+                document.getElementById('result').innerText = `Translated text: ${data.translatedText}`;
+                
+                // Translate the entire page
+                document.querySelectorAll('[data-translate]').forEach(element => {
+                    const translationKey = element.getAttribute('data-translate');
+                    if (data.translations.hasOwnProperty(translationKey)) {
+                        element.innerText = data.translations[translationKey];
+                    }
+                });
+            } catch (error) {
+                console.error('Translation error:', error);
+                document.getElementById('result').innerText = 'Translation failed';
+            }
+        }
     </script>
-  </body>
+</body>
 </html>

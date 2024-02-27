@@ -16,12 +16,12 @@ const Translate = function (options = {}) {
   }
 
   const defaults = {
-    from: "en",
+    from: "da",
     to: "en",
     cache: undefined,
     languages: languages,
     engines: engines,
-    engine: "google",
+    engine: "libre",
     keys: {},
   };
 
@@ -80,4 +80,6 @@ const Translate = function (options = {}) {
 // Small hack needed for Webpack/Babel: https://github.com/webpack/webpack/issues/706
 const exp = new Translate();
 exp.Translate = Translate;
+
+console.log("hello");
 export default exp;
