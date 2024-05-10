@@ -8,34 +8,69 @@
 <body>
     <h1>Translation API Test</h1>
 
-    <div>
-        <label for="text">Text:</label>
-        <input type="text" id="text" value="Hello world">
+    <div id="translations">
+        <div class="translation">
+            <label for="text1">Text 1:</label>
+            <input type="text" id="text1" value="Hello world">
+            <label for="targetLanguage1">Target Language:</label>
+            <select id="targetLanguage1" class="targetLanguage">
+                <option value="da">🇩🇰 Danish (Dansk)</option>
+                <option value="es">🇪🇸 Spanish (Español)</option>
+                <option value="fr">🇫🇷 French (Français)</option>
+                <option value="uk">🇺🇦 Ukrainian (Українська)</option>
+                <option value="pl">🇵🇱 Polish (Polski)</option>
+                <option value="ru">🇷🇺 Russian (Русский)</option>
+                <option value="de">🇩🇪 German (Deutsch)</option>
+                <!-- Add more options as needed -->
+            </select>
+        </div>
+        <div class="translation">
+            <label for="text2">Text 2:</label>
+            <input type="text" id="text2" value="How are you?">
+            <label for="targetLanguage2">Target Language:</label>
+            <select id="targetLanguage2" class="targetLanguage">
+                <option value="da">🇩🇰 Danish (Dansk)</option>
+                <option value="es">🇪🇸 Spanish (Español)</option>
+                <option value="fr">🇫🇷 French (Français)</option>
+                <option value="uk">🇺🇦 Ukrainian (Українська)</option>
+                <option value="pl">🇵🇱 Polish (Polski)</option>
+                <option value="ru">🇷🇺 Russian (Русский)</option>
+                <option value="de">🇩🇪 German (Deutsch)</option>
+                <!-- Add more options as needed -->
+            </select>
+        </div>
+        <div class="translation">
+            <label for="text3">Text 3:</label>
+            <input type="text" id="text3" value="Goodbye!">
+            <label for="targetLanguage3">Target Language:</label>
+            <select id="targetLanguage3" class="targetLanguage">
+                <option value="da">🇩🇰 Danish (Dansk)</option>
+                <option value="es">🇪🇸 Spanish (Español)</option>
+                <option value="fr">🇫🇷 French (Français)</option>
+                <option value="uk">🇺🇦 Ukrainian (Українська)</option>
+                <option value="pl">🇵🇱 Polish (Polski)</option>
+                <option value="ru">🇷🇺 Russian (Русский)</option>
+                <option value="de">🇩🇪 German (Deutsch)</option>
+                <!-- Add more options as needed -->
+            </select>
+        </div>
     </div>
 
-    <div>
-        <label for="targetLanguage">Target Language:</label>
-        <select id="targetLanguage">
-            <option value="da">🇩🇰 Danish (Dansk)</option>
-            <option value="es">🇪🇸 Spanish (Español)</option>
-            <option value="fr">🇫🇷 French (Français)</option>
-            <option value="uk">🇺🇦 Ukrainian (Українська)</option>
-            <option value="pl">🇵🇱 Polish (Polski)</option>
-            <option value="ru">🇷🇺 Russian (Русский)</option>
-            <option value="de">🇩🇪 German (Deutsch)</option>
-            <!-- Add more options as needed -->
-        </select>
-    </div>
-
-    <button onclick="performTranslation()">Translate</button>
+    <button onclick="performBulkTranslation()">Translate</button>
 
     <div id="result"></div>
 
     <script>
-        async function performTranslation() {
-            const text = document.getElementById('text').value;
-            const targetLanguage = document.getElementById('targetLanguage').value;
-            const url = 'http://localhost:3000/translate';
+        async function performBulkTranslation() {
+            const translations = [];
+            const translationElements = document.querySelectorAll('.translation');
+            translationElements.forEach((element, index) => {
+                const text = element.querySelector('input').value;
+                const targetLanguage = element.querySelector('select').value;
+                translations.push({ text, targetLanguage });
+            });
+
+            const url = 'http://localhost:3000/translatebulk';
 
             try {
                 const response = await fetch(url, {
@@ -43,7 +78,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ text, targetLanguage })
+                    body: JSON.stringify(translations)
                 });
 
                 if (!response.ok) {
@@ -51,15 +86,9 @@
                 }
 
                 const data = await response.json();
-                document.getElementById('result').innerText = `Translated text: ${data.translatedText}`;
-                
-                // Translate the entire page
-                document.querySelectorAll('[data-translate]').forEach(element => {
-                    const translationKey = element.getAttribute('data-translate');
-                    if (data.translations.hasOwnProperty(translationKey)) {
-                        element.innerText = data.translations[translationKey];
-                    }
-                });
+                const results = data.translatedTexts.map((item, index) => `Translated text ${index + 1}: ${item.translatedText}`);
+                document.getElementById('result').innerText = results.join('\n');
+
             } catch (error) {
                 console.error('Translation error:', error);
                 document.getElementById('result').innerText = 'Translation failed';

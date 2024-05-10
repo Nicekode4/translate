@@ -1,4 +1,3 @@
-// Import required modules
 import express from "express";
 import translate from "translate";
 import dotenv from "dotenv";
@@ -15,13 +14,13 @@ app.use(express.json());
 
 // Translate route
 app.post("/translate", async (req, res) => {
-  const { text, targetLanguage } = req.body;
+  const { text, targetLanguage, startLanguage } = req.body;
   if (!text || !targetLanguage) {
     return res.status(400).json({ error: "Text and target language are required" });
   }
 
   try {
-    const translatedText = await translate(text, {from: "da" ,  to: targetLanguage });
+    const translatedText = await translate(text, {from: startLanguage ,  to: targetLanguage });
     res.json({ translatedText });
   } catch (error) {
     res.status(500).json({ error: "Translation failed" });
