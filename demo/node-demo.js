@@ -1,6 +1,7 @@
 import express from "express";
 import translate from "translate";
 import dotenv from "dotenv";
+import cors from "cors"; // Import the cors package
 
 // Load environment variables
 dotenv.config();
@@ -11,6 +12,9 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+
+// Add CORS support
+app.use(cors()); // Use cors middleware
 
 // Translate route
 app.post("/translate", async (req, res) => {
@@ -53,6 +57,7 @@ app.post("/translatebulk", async (req, res) => {
     res.status(500).json({ error: "Translation failed" });
   }
 });
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
