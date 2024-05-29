@@ -1,23 +1,18 @@
-const express = require("express");
-const translate = require("translate-google-api"); 
-const dotenv = require("dotenv");
-const cors = require("cors");
+import express from "express";
+import translate from "translate";
+import dotenv from "dotenv";
 
-
+// Load environment variables
 dotenv.config();
 
+// Create an Express app
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
+// Middleware to parse JSON bodies
 app.use(express.json());
 
-// The `noCors` option is not a valid option for the `cors` middleware. Remove it.
-app.use(cors({ origin: true, credentials: true }));
-
-// Configure translate package with options
-translate.engine = "google"; // Assuming you're using Google Translate
-translate.key = process.env.TRANSLATE_API_KEY; // Make sure to set your API key in the environment variable
-
+// Translate route
 app.post("/translate", async (req, res) => {
   const { text, targetLanguage, startLanguage } = req.body;
   if (!text || !targetLanguage) {
@@ -25,34 +20,40 @@ app.post("/translate", async (req, res) => {
   }
 
   try {
-    const translatedText = await translate(text, { from: startLanguage, to: targetLanguage });
+    const translatedText = await translate(text, {from: "en" ,  to: targetLanguage });
     res.json({ translatedText });
   } catch (error) {
-    console.error("Translation failed:", error);
     res.status(500).json({ error: "Translation failed" });
   }
 });
 
+// Translate route for bulk translation
 app.post("/translatebulk", async (req, res) => {
   try {
+    // Extract text and targetLanguage pairs from the request body
     const translations = req.body;
 
+    // Check if translations array is provided
     if (!Array.isArray(translations) || translations.length === 0) {
       return res.status(400).json({ error: "Translations array is required" });
     }
 
+    // Perform translations for each text and targetLanguage pair
     const translatedTexts = await Promise.all(translations.map(async ({ text, targetLanguage }) => {
-      const translatedText = await translate(text, { to: targetLanguage });
+      // Perform translation
+      const translatedText = await translate(text,{to: targetLanguage});
       return { originalText: text, translatedText };
     }));
 
+    // Send the translated texts in the response
     res.json({ translatedTexts });
   } catch (error) {
+    // Handle any errors that occur during translation
     console.error("Translation failed:", error);
     res.status(500).json({ error: "Translation failed" });
   }
 });
-
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

@@ -1,6 +1,7 @@
 {
   "name": "demo",
   "version": "1.0.0",
+  "type":"module",
   "description": "For the HTML one, run an http server from the root like `http-server` and open `http://localhost:8080/demo` to see it in action.",
   "main": "index.js",
   "dependencies": {
